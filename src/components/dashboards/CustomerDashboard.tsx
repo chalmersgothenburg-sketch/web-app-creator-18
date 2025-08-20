@@ -2,8 +2,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, ResponsiveContainer } from "recharts";
-import { Heart, Activity, Battery, Shield, Phone, Upload, FileText } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EmergencyMonitor } from "@/components/EmergencyMonitor";
@@ -31,6 +32,35 @@ const recentActivities = [
   { activity: "Morning walk", duration: "30 min", time: "7:30 AM", calories: 150 },
   { activity: "Light exercise", duration: "15 min", time: "10:00 AM", calories: 80 },
   { activity: "Garden work", duration: "45 min", time: "4:00 PM", calories: 200 },
+];
+
+const weeklyActivity = [
+  { day: "M", active: true },
+  { day: "T", active: false },
+  { day: "W", active: true },
+  { day: "T", active: true },
+  { day: "F", active: false },
+  { day: "S", active: true },
+  { day: "S", active: true },
+];
+
+const calorieData = [
+  { day: "Mon", calories: 1850 },
+  { day: "Tue", calories: 1920 },
+  { day: "Wed", calories: 1780 },
+  { day: "Thu", calories: 1931 },
+  { day: "Fri", calories: 2100 },
+  { day: "Sat", calories: 1650 },
+  { day: "Sun", calories: 1890 },
+];
+
+const stressData = [
+  { time: "6:00", stress: 25 },
+  { time: "9:00", stress: 45 },
+  { time: "12:00", stress: 30 },
+  { time: "15:00", stress: 55 },
+  { time: "18:00", stress: 20 },
+  { time: "21:00", stress: 30 },
 ];
 
 export const CustomerDashboard = () => {
@@ -109,6 +139,148 @@ export const CustomerDashboard = () => {
               <p className="text-sm text-green-600">All systems normal</p>
             </div>
           </div>
+        </Card>
+      </div>
+
+      {/* Enhanced Health Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Intensity Minutes */}
+        <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+          <div className="flex items-center mb-4">
+            <Clock className="h-6 w-6 text-orange-600 mr-3" />
+            <h3 className="text-lg font-semibold text-orange-700">Intensity Minutes</h3>
+          </div>
+          
+          <div className="flex items-center justify-center mb-4">
+            <div className="relative w-32 h-32">
+              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="#fed7aa"
+                  strokeWidth="8"
+                  fill="none"
+                />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="#ea580c"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(110/150) * 314} 314`}
+                  strokeDashoffset="0"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-3xl font-bold text-orange-700">110</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mb-4">
+            <p className="text-sm text-orange-600">150</p>
+          </div>
+          
+          <div className="flex justify-center space-x-2">
+            {weeklyActivity.map((day, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <div className={`w-3 h-3 rounded-full mb-1 ${day.active ? 'bg-orange-600' : 'bg-orange-200'}`}></div>
+                <span className="text-xs text-orange-600">{day.day}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Calories Burned */}
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <div className="flex items-center mb-4">
+            <Flame className="h-6 w-6 text-green-600 mr-3" />
+            <h3 className="text-lg font-semibold text-green-700">Calories Burned</h3>
+          </div>
+          
+          <div className="text-center mb-4">
+            <p className="text-3xl font-bold text-green-700">1,931</p>
+          </div>
+          
+          <div className="mb-4">
+            <div className="flex justify-between mb-2">
+              <span className="text-sm text-green-600">Active: 540</span>
+              <span className="text-sm text-green-600">Resting: 1,391</span>
+            </div>
+            <div className="w-full bg-green-200 rounded-full h-3">
+              <div 
+                className="bg-red-500 h-3 rounded-l-full"
+                style={{ width: `${(540/1931) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+          
+          <div className="text-center mb-2">
+            <p className="text-xs text-green-600">Last 7d</p>
+          </div>
+          
+          <ResponsiveContainer width="100%" height={60}>
+            <BarChart data={calorieData}>
+              <Bar dataKey="calories" fill="#16a34a" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Stress */}
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <div className="flex items-center mb-4">
+            <Brain className="h-6 w-6 text-blue-600 mr-3" />
+            <h3 className="text-lg font-semibold text-blue-700">Stress</h3>
+          </div>
+          
+          <div className="flex items-center justify-center mb-4">
+            <div className="relative w-32 h-32">
+              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="#bfdbfe"
+                  strokeWidth="8"
+                  fill="none"
+                />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="#2563eb"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(30/100) * 314} 314`}
+                  strokeDashoffset="0"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-3xl font-bold text-blue-700">30</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-between text-xs text-blue-600 mb-2">
+            <span>12 AM</span>
+            <span>12 AM</span>
+          </div>
+          
+          <ResponsiveContainer width="100%" height={60}>
+            <AreaChart data={stressData}>
+              <Area 
+                type="monotone" 
+                dataKey="stress" 
+                stroke="#2563eb" 
+                fill="#3b82f6"
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </Card>
       </div>
 
