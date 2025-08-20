@@ -2,51 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* SeniorCare Health Watch Design System - Warm, caring, accessible */
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 210 17% 98%;
+    --foreground: 215 25% 27%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 27%;
 
-    --primary: 221 83% 53%;
+    /* Caring blue primary - trustworthy and calming */
+    --primary: 210 100% 56%;
+    --primary-glow: 210 100% 70%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Warm secondary - approachable and friendly */
+    --secondary: 25 95% 95%;
+    --secondary-foreground: 215 25% 27%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Soft muted tones */
+    --muted: 210 17% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 215 20% 65%;
-    --accent-foreground: 0 0% 100%;
+    /* Gentle accent - health-focused green */
+    --accent: 150 60% 88%;
+    --accent-foreground: 150 100% 25%;
+
+    /* Emergency red - clear but not alarming */
+    --emergency: 0 75% 60%;
+    --emergency-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --emergency: 350 90% 60%;
-    --emergency-foreground: 0 0% 100%;
+    --border: 210 20% 92%;
+    --input: 210 20% 92%;
+    --ring: 210 100% 56%;
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+    /* Beautiful gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 56%), hsl(210 100% 70%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 17% 98%));
+    --gradient-feature: linear-gradient(135deg, hsl(150 60% 88%), hsl(150 40% 92%));
+    
+    /* Elegant shadows */
+    --shadow-soft: 0 4px 12px -2px hsl(210 100% 56% / 0.1);
+    --shadow-card: 0 8px 30px -8px hsl(215 25% 27% / 0.15);
+    --shadow-hero: 0 20px 60px -12px hsl(210 100% 56% / 0.25);
 
-    --healthcare-blue: 221 83% 53%;
-    --healthcare-light: 220 14% 96%;
-    --healthcare-gray: 215 14% 34%;
+    /* Smooth transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
-
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
 
