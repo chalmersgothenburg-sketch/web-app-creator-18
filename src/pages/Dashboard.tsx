@@ -99,11 +99,12 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex">
-        {userRole === 'customer' && <DashboardSidebar onSignOut={handleSignOut} />}
-        <main className={`flex-1 p-6 ${userRole !== 'customer' ? 'ml-0' : ''}`}>
-          <div className="max-w-7xl mx-auto space-y-6">
-            {userRole !== 'customer' && (
+      {userRole === 'customer' ? (
+        <DashboardSidebar onSignOut={handleSignOut} />
+      ) : (
+        <div className="flex">
+          <main className="flex-1 p-6">
+            <div className="max-w-7xl mx-auto space-y-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="text-sm text-muted-foreground">
                   Welcome back, {user.email}
@@ -118,12 +119,12 @@ export const Dashboard = () => {
                   </button>
                 </div>
               </div>
-            )}
-            
-            {renderDashboard()}
-          </div>
-        </main>
-      </div>
+              
+              {renderDashboard()}
+            </div>
+          </main>
+        </div>
+      )}
     </div>
   );
 };
