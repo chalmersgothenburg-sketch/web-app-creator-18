@@ -101,7 +101,7 @@ export const ChatBox: React.FC = () => {
   }
 
   return (
-    <Card className="fixed bottom-4 right-4 w-[30rem] h-[36rem] z-50 flex flex-col shadow-xl border border-border bg-background">
+    <Card className="fixed bottom-4 right-4 w-[24rem] h-[28.8rem] z-50 flex flex-col shadow-xl border border-border bg-background scale-80 origin-bottom-right">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-primary text-primary-foreground rounded-t-lg">
         <div className="flex items-center space-x-2">

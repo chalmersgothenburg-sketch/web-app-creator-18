@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain } from "lucide-react";
+import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EmergencyMonitor } from "@/components/EmergencyMonitor";
 import { PrescriptionUpload } from "@/components/PrescriptionUpload";
 import { InsuranceUpload } from "@/components/InsuranceUpload";
 import { ChatBox } from "@/components/ChatBox";
+import { StepsDetailModal } from "@/components/StepsDetailModal";
 
 const healthData = [
   { time: "6:00", heartRate: 68, bloodPressure: 120, steps: 0 },
@@ -66,6 +67,7 @@ const stressData = [
 export const CustomerDashboard = () => {
   const { toast } = useToast();
   const [reportRequest, setReportRequest] = useState("");
+  const [showStepsModal, setShowStepsModal] = useState(false);
 
   const handleReportSubmit = () => {
     if (!reportRequest.trim()) {
@@ -97,48 +99,79 @@ export const CustomerDashboard = () => {
 
       {/* Health Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center space-x-2">
-            <Heart className="h-8 w-8 text-red-500" />
+        <Card className="group relative overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:shadow-lg transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Heart className="h-10 w-10 text-red-500" />
+              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
             <div>
-              <p className="text-sm text-muted-foreground">Heart Rate</p>
-              <p className="text-2xl font-bold text-foreground">72 BPM</p>
-              <p className="text-sm text-green-600">Normal</p>
+              <p className="text-sm text-red-600/70 font-medium">Heart Rate</p>
+              <p className="text-3xl font-bold text-red-700 mb-1">72</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Normal Range</p>
             </div>
           </div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-rose-400"></div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center space-x-2">
-            <Activity className="h-8 w-8 text-primary" />
+        <Card className="group relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200 hover:shadow-lg transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Activity className="h-10 w-10 text-blue-600" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowStepsModal(true)}
+                className="h-8 w-8 p-0 hover:bg-blue-100 text-blue-600"
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </div>
             <div>
-              <p className="text-sm text-muted-foreground">Daily Steps</p>
-              <p className="text-2xl font-bold text-foreground">10,500</p>
-              <p className="text-sm text-green-600">Goal achieved!</p>
+              <p className="text-sm text-blue-600/70 font-medium">Daily Steps</p>
+              <p className="text-3xl font-bold text-blue-700 mb-1">10,500</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Goal Achieved! 🎉</p>
             </div>
           </div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-400"></div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center space-x-2">
-            <Battery className="h-8 w-8 text-secondary" />
+        <Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Battery className="h-10 w-10 text-emerald-600" />
+              <div className="text-right">
+                <div className="h-3 w-8 border-2 border-emerald-600 rounded-sm relative">
+                  <div className="absolute inset-0.5 bg-emerald-500 rounded-sm" style={{ width: '78%' }}></div>
+                </div>
+              </div>
+            </div>
             <div>
-              <p className="text-sm text-muted-foreground">Device Battery</p>
-              <p className="text-2xl font-bold text-foreground">78%</p>
-              <p className="text-sm text-muted-foreground">Good level</p>
+              <p className="text-sm text-emerald-600/70 font-medium">Device Battery</p>
+              <p className="text-3xl font-bold text-emerald-700 mb-1">78%</p>
+              <p className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full inline-block">Good Level</p>
             </div>
           </div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-400"></div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center space-x-2">
-            <Shield className="h-8 w-8 text-green-600" />
+        <Card className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-purple-100 border-violet-200 hover:shadow-lg transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Shield className="h-10 w-10 text-violet-600" />
+              <div className="flex space-x-1">
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+              </div>
+            </div>
             <div>
-              <p className="text-sm text-muted-foreground">Health Status</p>
-              <p className="text-2xl font-bold text-foreground">Good</p>
-              <p className="text-sm text-green-600">All systems normal</p>
+              <p className="text-sm text-violet-600/70 font-medium">Health Status</p>
+              <p className="text-3xl font-bold text-violet-700 mb-1">Excellent</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">All Systems Normal</p>
             </div>
           </div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-violet-400 to-purple-400"></div>
         </Card>
       </div>
 
@@ -392,6 +425,9 @@ export const CustomerDashboard = () => {
           </div>
         </div>
       </Card>
+
+      {/* Steps Detail Modal */}
+      <StepsDetailModal isOpen={showStepsModal} onClose={() => setShowStepsModal(false)} />
 
       {/* AI Chatbox */}
       <ChatBox />
