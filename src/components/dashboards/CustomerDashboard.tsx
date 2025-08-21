@@ -12,6 +12,9 @@ import { PrescriptionUpload } from "@/components/PrescriptionUpload";
 import { InsuranceUpload } from "@/components/InsuranceUpload";
 import { ChatBox } from "@/components/ChatBox";
 import { StepsDetailModal } from "@/components/StepsDetailModal";
+import { HeartRateDetailModal } from "@/components/HeartRateDetailModal";
+import { CaloriesDetailModal } from "@/components/CaloriesDetailModal";
+import { MapCard } from "@/components/MapCard";
 
 const healthData = [
   { time: "6:00", heartRate: 68, bloodPressure: 120, steps: 0 },
@@ -68,6 +71,8 @@ export const CustomerDashboard = () => {
   const { toast } = useToast();
   const [reportRequest, setReportRequest] = useState("");
   const [showStepsModal, setShowStepsModal] = useState(false);
+  const [showHeartRateModal, setShowHeartRateModal] = useState(false);
+  const [showCaloriesModal, setShowCaloriesModal] = useState(false);
 
   const handleReportSubmit = () => {
     if (!reportRequest.trim()) {
@@ -103,7 +108,14 @@ export const CustomerDashboard = () => {
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <Heart className="h-10 w-10 text-red-500" />
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHeartRateModal(true)}
+                className="h-8 w-8 p-0 hover:bg-red-100 text-red-600"
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
             </div>
             <div>
               <p className="text-sm text-red-600/70 font-medium">Heart Rate</p>
@@ -175,8 +187,8 @@ export const CustomerDashboard = () => {
         </Card>
       </div>
 
-      {/* Enhanced Health Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Enhanced Health Metrics and Map */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Intensity Minutes */}
         <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <div className="flex items-center mb-4">
@@ -229,9 +241,19 @@ export const CustomerDashboard = () => {
 
         {/* Calories Burned */}
         <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <div className="flex items-center mb-4">
+          <div className="flex items-center justify-between mb-4">
             <Flame className="h-6 w-6 text-green-600 mr-3" />
-            <h3 className="text-lg font-semibold text-green-700">Calories Burned</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-green-700">Calories Burned</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCaloriesModal(true)}
+                className="h-8 w-8 p-0 hover:bg-green-100 text-green-600"
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
           <div className="text-center mb-4">
@@ -315,6 +337,9 @@ export const CustomerDashboard = () => {
             </AreaChart>
           </ResponsiveContainer>
         </Card>
+
+        {/* Map Card */}
+        <MapCard className="lg:col-span-1" />
       </div>
 
      {/* Health Charts */}
@@ -428,6 +453,12 @@ export const CustomerDashboard = () => {
 
       {/* Steps Detail Modal */}
       <StepsDetailModal isOpen={showStepsModal} onClose={() => setShowStepsModal(false)} />
+      
+      {/* Heart Rate Detail Modal */}
+      <HeartRateDetailModal isOpen={showHeartRateModal} onClose={() => setShowHeartRateModal(false)} />
+      
+      {/* Calories Detail Modal */}
+      <CaloriesDetailModal isOpen={showCaloriesModal} onClose={() => setShowCaloriesModal(false)} />
 
       {/* AI Chatbox */}
       <ChatBox />
