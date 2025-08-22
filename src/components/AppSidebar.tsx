@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Phone, Shield, Heart, MessageCircle, LogIn } from "lucide-react";
+import { User, Phone, Shield, Heart, MessageCircle, LogIn, Activity } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sidebar,
@@ -17,10 +17,11 @@ import {
 import { Button } from "@/components/ui/button";
 
 const navigationItems = [
-  { title: "Health Dashboard", icon: Heart, path: "/dashboard" },
-  { title: "Emergency Services", icon: Phone, action: () => console.log("Emergency") },
-  { title: "Family Connect", icon: MessageCircle, action: () => console.log("Family") },
-  { title: "Insurance Support", icon: Shield, action: () => console.log("Insurance") },
+  { title: "Home", icon: Heart, action: () => window.scrollTo(0, 0) },
+  { title: "Features", icon: Activity, action: () => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) },
+  { title: "Plans", icon: Shield, action: () => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }) },
+  { title: "Why Us", icon: MessageCircle, action: () => document.getElementById('why-us')?.scrollIntoView({ behavior: 'smooth' }) },
+  { title: "FAQs", icon: Phone, action: () => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' }) },
 ];
 
 export function AppSidebar() {
@@ -51,22 +52,10 @@ export function AppSidebar() {
         {/* Logo section */}
         <div className={`mb-8 ${collapsed ? "text-center" : ""}`}>
           {!collapsed ? (
-            <h2 className="text-xl font-semibold text-foreground">SeniorCare</h2>
+            <h2 className="text-xl font-semibold text-foreground">WeCareWell</h2>
           ) : (
             <div className="w-8 h-8 bg-gradient-hero rounded-lg mx-auto"></div>
           )}
-        </div>
-
-        {/* Login Button */}
-        <div className="mb-6">
-          <Button 
-            onClick={handleLogin}
-            variant="hero"
-            className={`w-full ${collapsed ? "px-2" : ""}`}
-          >
-            <LogIn className="h-4 w-4" />
-            {!collapsed && <span className="ml-2">Customer Login</span>}
-          </Button>
         </div>
 
         {/* Navigation */}

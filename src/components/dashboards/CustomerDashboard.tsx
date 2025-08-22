@@ -93,9 +93,9 @@ export const CustomerDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-screen overflow-y-auto space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">My Health Dashboard</h1>
+        <h1 className="text-2xl font-bold text-foreground">My Health Dashboard</h1>
         <Badge variant="secondary">Customer Portal</Badge>
       </div>
 
@@ -103,7 +103,7 @@ export const CustomerDashboard = () => {
       <EmergencyMonitor />
 
       {/* Health Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="group relative overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:shadow-lg transition-all duration-300">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -188,7 +188,7 @@ export const CustomerDashboard = () => {
       </div>
 
       {/* Enhanced Health Metrics and Map */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Intensity Minutes */}
         <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <div className="flex items-center mb-4">
@@ -343,7 +343,7 @@ export const CustomerDashboard = () => {
       </div>
 
      {/* Health Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="p-6 bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
           <h3 className="text-lg font-semibold mb-4 text-red-700">Today's Heart Rate</h3>
           <ResponsiveContainer width="100%" height={300}>
