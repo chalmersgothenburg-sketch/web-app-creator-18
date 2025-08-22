@@ -2,18 +2,35 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { User, Session } from "@supabase/supabase-js";
-import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { MarketingDashboard } from "@/components/dashboards/MarketingDashboard";
 import { FinanceDashboard } from "@/components/dashboards/FinanceDashboard";
 import { CustomerSupportDashboard } from "@/components/dashboards/CustomerSupportDashboard";
 import { CustomerDashboard } from "@/components/dashboards/CustomerDashboard";
+import { EmergencyDashboard } from "@/components/dashboards/EmergencyDashboard";
+import { PrescriptionDashboard } from "@/components/dashboards/PrescriptionDashboard";
+import { InsuranceDashboard } from "@/components/dashboards/InsuranceDashboard";
+import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { 
+  Heart, 
+  Activity, 
+  Shield, 
+  MessageCircle, 
+  Phone, 
+  AlertTriangle, 
+  FileText, 
+  Settings,
+  LogOut
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("dashboard");
   const navigate = useNavigate();
 
   // Determine user role based on email domain
@@ -32,6 +49,24 @@ export const Dashboard = () => {
   };
 
   const userRole = user?.email ? getUserRole(user.email) : 'customer';
+
+  // Navigation items for main pages
+  const mainNavItems = [
+    { id: "home", label: "Home", icon: Heart, action: () => navigate("/") },
+    { id: "features", label: "Features", icon: Activity, action: () => navigate("/") },
+    { id: "plans", label: "Plans", icon: Shield, action: () => navigate("/") },
+    { id: "why-us", label: "Why Us", icon: MessageCircle, action: () => navigate("/") },
+    { id: "faqs", label: "FAQs", icon: Phone, action: () => navigate("/") },
+  ];
+
+  // Dashboard navigation items (only for customers)
+  const dashboardNavItems = [
+    { id: "dashboard", label: "Dashboard", icon: Activity },
+    { id: "emergency", label: "Emergency", icon: AlertTriangle },
+    { id: "prescriptions", label: "Prescriptions", icon: FileText },
+    { id: "insurance", label: "Insurance", icon: Shield },
+    { id: "settings", label: "Settings", icon: Settings },
+  ];
 
   useEffect(() => {
     // Set up auth state listener
@@ -93,38 +128,81 @@ export const Dashboard = () => {
         return <CustomerSupportDashboard />;
       case 'customer':
       default:
+        return renderCustomerDashboard();
+    }
+  };
+
+  const renderCustomerDashboard = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return <CustomerDashboard />;
+      case "emergency":
+        return <EmergencyDashboard />;
+      case "prescriptions":
+        return <PrescriptionDashboard />;
+      case "insurance":
+        return <InsuranceDashboard />;
+      case "settings":
+        return <SettingsDashboard />;
+      default:
         return <CustomerDashboard />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {userRole === 'customer' ? (
-        <DashboardSidebar onSignOut={handleSignOut} />
-      ) : (
-        <div className="flex">
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="text-sm text-muted-foreground">
-                  Welcome back, {user.email}
-                </div>
-                <div className="flex items-center space-x-4">
-                  <ThemeToggle />
-                  <button
-                    onClick={handleSignOut}
-                    className="text-sm text-muted-foreground hover:text-foreground"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-              
-              {renderDashboard()}
+      {/* Header with Navigation Tabs */}
+      <header className="h-16 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 px-6">
+        <div className="flex items-center">
+          <h1 className="text-xl font-semibold text-foreground mr-8">WeCareWell</h1>
+          
+          {userRole === 'customer' ? (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+              <TabsList className="grid grid-cols-5 w-full max-w-md">
+                {dashboardNavItems.map((item) => (
+                  <TabsTrigger key={item.id} value={item.id} className="text-xs">
+                    {item.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          ) : (
+            <div className="flex items-center space-x-6">
+              {mainNavItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={item.action}
+                  className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </button>
+              ))}
             </div>
-          </main>
+          )}
         </div>
-      )}
+
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
+          <ThemeToggle />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSignOut}
+            className="flex items-center"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 p-6">
+        <div className="max-w-7xl mx-auto">
+          {renderDashboard()}
+        </div>
+      </main>
     </div>
   );
 };
