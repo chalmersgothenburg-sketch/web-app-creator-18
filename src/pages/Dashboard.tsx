@@ -31,7 +31,6 @@ export const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
 
   // Determine user role based on email domain
@@ -69,36 +68,13 @@ export const Dashboard = () => {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
-  // Fetch user profile data
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
-        return;
-      }
-      
-      setUserProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
 
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await fetchUserProfile(session.user.id);
-        }
         
         if (!session) {
           navigate("/auth");
@@ -108,13 +84,9 @@ export const Dashboard = () => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchUserProfile(session.user.id);
-      }
       
       if (!session) {
         navigate("/auth");
@@ -219,7 +191,7 @@ export const Dashboard = () => {
 
         <div className="flex items-center space-x-4">
           <span className="text-sm text-muted-foreground font-medium">
-            Welcome, {userProfile?.full_name || user.email?.split('@')[0]}
+            Welcome, {user.email?.split('@')[0]}
           </span>
           <ThemeToggle />
           <Button
