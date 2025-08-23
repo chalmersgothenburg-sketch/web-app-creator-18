@@ -31,6 +31,7 @@ export const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
 
   // Determine user role based on email domain
@@ -68,12 +69,36 @@ export const Dashboard = () => {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
+  // Fetch user profile data
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id);
+        }
         
         if (!session) {
           navigate("/auth");
@@ -83,9 +108,13 @@ export const Dashboard = () => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        await fetchUserProfile(session.user.id);
+      }
       
       if (!session) {
         navigate("/auth");
@@ -152,16 +181,22 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header with Navigation Tabs */}
-      <header className="h-16 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 px-6">
-        <div className="flex items-center">
-          <h1 className="text-xl font-semibold text-foreground mr-8">WeCareWell</h1>
+      <header className="h-20 flex items-center justify-between border-b border-border bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 backdrop-blur-sm sticky top-0 z-40 px-6">
+        <div className="flex items-center flex-1">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mr-8">WeCareWell</h1>
           
           {userRole === 'customer' ? (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-              <TabsList className="grid grid-cols-5 w-full max-w-md">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 max-w-4xl">
+              <TabsList className="grid grid-cols-5 w-full h-14 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-2 gap-2">
                 {dashboardNavItems.map((item) => (
-                  <TabsTrigger key={item.id} value={item.id} className="text-xs">
-                    {item.label}
+                  <TabsTrigger 
+                    key={item.id} 
+                    value={item.id} 
+                    className="relative text-sm font-medium px-6 py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300 hover:bg-white/50 dark:hover:bg-white/10 flex items-center gap-2"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{item.label}</span>
+                    <span className="sm:hidden">{item.label.slice(0, 3)}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -183,7 +218,9 @@ export const Dashboard = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
+          <span className="text-sm text-muted-foreground font-medium">
+            Welcome, {userProfile?.full_name || user.email?.split('@')[0]}
+          </span>
           <ThemeToggle />
           <Button
             variant="outline"

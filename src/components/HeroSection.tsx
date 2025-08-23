@@ -44,7 +44,7 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/auth">
                 <Button variant="hero" size="lg" className="text-lg">
-                  Get Started Today
+                  Connect with Us
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
