@@ -68,7 +68,6 @@ export const Dashboard = () => {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
-
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -151,52 +150,31 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10">
-      {/* Enhanced Header with Glass Effect */}
-      <header className="h-24 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 backdrop-blur-xl sticky top-0 z-50 px-8 shadow-lg shadow-primary/5">
-        <div className="flex items-center flex-1">
-          <div className="flex items-center mr-12">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-4 shadow-xl">
-              <Heart className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              WeCareWell
-            </h1>
-          </div>
+    <div className="min-h-screen bg-background">
+      {/* Header with Navigation Tabs */}
+      <header className="h-16 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 px-6">
+        <div className="flex items-center">
+          <h1 className="text-xl font-semibold text-foreground mr-8">WeCareWell</h1>
           
           {userRole === 'customer' ? (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 max-w-5xl">
-              <TabsList className="grid grid-cols-5 w-full h-16 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-3xl p-3 gap-3 border border-white/20 shadow-2xl backdrop-blur-sm">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+              <TabsList className="grid grid-cols-5 w-full max-w-md">
                 {dashboardNavItems.map((item) => (
-                  <TabsTrigger 
-                    key={item.id} 
-                    value={item.id} 
-                    className="relative text-sm font-semibold px-8 py-4 rounded-2xl transition-all duration-500 ease-out
-                               data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-secondary 
-                               data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:shadow-primary/30
-                               data-[state=active]:scale-105 data-[state=active]:transform
-                               hover:bg-gradient-to-br hover:from-primary/10 hover:to-secondary/10 hover:scale-102
-                               hover:shadow-lg hover:shadow-primary/10
-                               flex items-center gap-3 group"
-                  >
-                    <item.icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 group-data-[state=active]:drop-shadow-sm" />
-                    <span className="hidden sm:inline transition-all duration-300">{item.label}</span>
-                    <span className="sm:hidden transition-all duration-300">{item.label.slice(0, 3)}</span>
-                    {/* Active indicator */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 opacity-0 data-[state=active]:opacity-100 transition-opacity duration-300 -z-10" />
+                  <TabsTrigger key={item.id} value={item.id} className="text-xs">
+                    {item.label}
                   </TabsTrigger>
                 ))}
               </TabsList>
             </Tabs>
           ) : (
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-6">
               {mainNavItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={item.action}
-                  className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105 group"
+                  className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <item.icon className="h-5 w-5 mr-3 transition-transform duration-300 group-hover:scale-110" />
+                  <item.icon className="h-4 w-4 mr-2" />
                   {item.label}
                 </button>
               ))}
@@ -204,32 +182,25 @@ export const Dashboard = () => {
           )}
         </div>
 
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-4 px-6 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl border border-white/20 backdrop-blur-sm">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-green-600 animate-pulse shadow-lg shadow-green-400/50"></div>
-            <span className="text-sm font-semibold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text">
-              Welcome, {user.email?.split('@')[0]}
-            </span>
-          </div>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
           <ThemeToggle />
           <Button
             variant="outline"
             size="sm"
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/50 border-red-200 dark:border-red-800 hover:bg-gradient-to-r hover:from-red-100 hover:to-red-200 dark:hover:from-red-900/70 dark:hover:to-red-800/70 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-200/50 dark:hover:shadow-red-900/50"
+            className="flex items-center"
           >
-            <LogOut className="h-4 w-4" />
-            <span className="font-medium">Sign Out</span>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
           </Button>
         </div>
       </header>
 
-      {/* Main Content with Enhanced Spacing */}
-      <main className="flex-1 p-8">
+      {/* Main Content */}
+      <main className="flex-1 p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="animate-fade-in">
-            {renderDashboard()}
-          </div>
+          {renderDashboard()}
         </div>
       </main>
     </div>
