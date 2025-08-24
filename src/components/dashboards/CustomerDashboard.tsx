@@ -7,10 +7,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area,
 import { Heart, Activity, Battery, Shield, FileText, BarChart3, Droplets, Activity as Pulse, Moon, Zap, Phone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-// import { EmergencyMonitor } from "@/components/EmergencyMonitor";
-// import { PrescriptionUpload } from "@/components/PrescriptionUpload";
-// import { InsuranceUpload } from "@/components/InsuranceUpload";
-import { TempEmergencyMonitor } from "@/components/TempMockComponents";
+import { EmergencyMonitor } from "@/components/EmergencyMonitor";
+import { PrescriptionUpload } from "@/components/PrescriptionUpload";
+import { InsuranceUpload } from "@/components/InsuranceUpload";
 import { ChatBox } from "@/components/ChatBox";
 import { StepsDetailModal } from "@/components/StepsDetailModal";
 import { HeartRateDetailModal } from "@/components/HeartRateDetailModal";
@@ -151,7 +150,7 @@ export const CustomerDashboard = () => {
       </div>
 
       {/* Emergency Monitor - Always at top for customers */}
-      <TempEmergencyMonitor />
+      <EmergencyMonitor />
 
       {/* Health Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
