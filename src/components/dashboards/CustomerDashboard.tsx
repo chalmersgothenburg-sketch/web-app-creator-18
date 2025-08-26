@@ -143,7 +143,7 @@ export const CustomerDashboard = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto space-y-4 p-4">
+    <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">My Health Dashboard</h1>
         <Badge variant="secondary">Customer Portal</Badge>

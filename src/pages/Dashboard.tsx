@@ -1,3 +1,4 @@
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +32,7 @@ export const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Determine user role based on email domain
@@ -156,35 +158,37 @@ export const Dashboard = () => {
         <div className="flex items-center">
           <h1 className="text-xl font-semibold text-foreground mr-8">WeCareWell</h1>
           
-          {userRole === 'customer' ? (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-              <TabsList className="grid grid-cols-5 w-full max-w-md">
-                {dashboardNavItems.map((item) => (
-                  <TabsTrigger key={item.id} value={item.id} className="text-xs">
+          <div className="hidden md:flex">
+            {userRole === 'customer' ? (
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+                <TabsList className="grid grid-cols-5 w-full max-w-md">
+                  {dashboardNavItems.map((item) => (
+                    <TabsTrigger key={item.id} value={item.id} className="text-xs">
+                      {item.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            ) : (
+              <div className="flex items-center space-x-6">
+                {mainNavItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={item.action}
+                    className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
                     {item.label}
-                  </TabsTrigger>
+                  </button>
                 ))}
-              </TabsList>
-            </Tabs>
-          ) : (
-            <div className="flex items-center space-x-6">
-              {mainNavItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={item.action}
-                  className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <item.icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-4">
           <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
           <Button
             variant="outline"
             size="sm"
@@ -195,7 +199,68 @@ export const Dashboard = () => {
             Sign Out
           </Button>
         </div>
+        {/* Mobile Hamburger */}
+        <button
+          className="md:hidden text-foreground"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </header>
+
+      {/* Mobile Dropdown Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-card border-b border-border shadow-lg p-4 space-y-4">
+          <span className="block text-sm text-muted-foreground">Welcome, {user.email}</span>
+
+          {userRole === 'customer' ? (
+            <div className="flex flex-col space-y-2">
+              {dashboardNavItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-left text-gray-700 hover:text-blue-600"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-2">
+              {mainNavItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    item.action();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center text-gray-700 hover:text-blue-600"
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Mobile Footer Actions */}
+          <div className="flex items-center justify-between pt-4 border-t">
+            {/* <ThemeToggle /> */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+              className="flex items-center"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 p-6">
