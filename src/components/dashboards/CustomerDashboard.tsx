@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3, Zap, Gauge } from "lucide-react";
+import { Heart, Activity, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3, Zap, Gauge } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EmergencyMonitor } from "@/components/EmergencyMonitor";
@@ -14,7 +14,11 @@ import { ChatBox } from "@/components/ChatBox";
 import { StepsDetailModal } from "@/components/StepsDetailModal";
 import { HeartRateDetailModal } from "@/components/HeartRateDetailModal";
 import { CaloriesDetailModal } from "@/components/CaloriesDetailModal";
+import { SpO2DetailModal } from "@/components/SpO2DetailModal";
+import { BloodPressureDetailModal } from "@/components/BloodPressureDetailModal";
+import { SleepTrackingCard } from "@/components/SleepTrackingCard";
 import { MapCard } from "@/components/MapCard";
+import ActivityCard from "@/components/ActivityCard";
 
 const healthData = [
   { time: "6:00", heartRate: 68, bloodPressure: 120, steps: 0 },
@@ -105,7 +109,7 @@ export const CustomerDashboard = () => {
       <EmergencyMonitor />
 
       {/* Health Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="group relative overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:shadow-lg transition-all duration-300">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -194,24 +198,6 @@ export const CustomerDashboard = () => {
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-sky-400"></div>
         </Card>
 
-        <Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Battery className="h-10 w-10 text-emerald-600" />
-              <div className="text-right">
-                <div className="h-3 w-8 border-2 border-emerald-600 rounded-sm relative">
-                  <div className="absolute inset-0.5 bg-emerald-500 rounded-sm" style={{ width: '78%' }}></div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-emerald-600/70 font-medium">Device Battery</p>
-              <p className="text-3xl font-bold text-emerald-700 mb-1">78%</p>
-              <p className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full inline-block">Good Level</p>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-400"></div>
-        </Card>
 
         <Card className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-purple-100 border-violet-200 hover:shadow-lg transition-all duration-300">
           <div className="p-6">
@@ -233,8 +219,8 @@ export const CustomerDashboard = () => {
         </Card>
       </div>
 
-      {/* Enhanced Health Metrics and Map */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Enhanced Health Metrics, Sleep, and Map */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Calories Burned */}
         <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <div className="flex items-center justify-between mb-4">
@@ -280,43 +266,16 @@ export const CustomerDashboard = () => {
           </ResponsiveContainer>
         </Card>
 
+        {/* Sleep Tracking Card */}
+        <SleepTrackingCard />
+
         {/* Map Card */}
         <MapCard className="lg:col-span-1" />
       </div>
 
-     {/* Health Charts */}
+     {/* Enhanced Activity Card */}
       <div className="grid grid-cols-1 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-          <h3 className="text-lg font-semibold mb-4 text-blue-700">Daily Activity</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={healthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="time" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="steps" 
-                stroke="#2563eb" 
-                fill="url(#blueGradient)"
-                strokeWidth={2}
-              />
-              <defs>
-                <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-            </AreaChart>
-          </ResponsiveContainer>
-        </Card>
+        <ActivityCard />
       </div>
 
       
@@ -374,6 +333,12 @@ export const CustomerDashboard = () => {
       
       {/* Calories Detail Modal */}
       <CaloriesDetailModal isOpen={showCaloriesModal} onClose={() => setShowCaloriesModal(false)} />
+      
+      {/* SpO2 Detail Modal */}
+      <SpO2DetailModal isOpen={showSpO2Modal} onClose={() => setShowSpO2Modal(false)} />
+      
+      {/* Blood Pressure Detail Modal */}
+      <BloodPressureDetailModal isOpen={showBloodPressureModal} onClose={() => setShowBloodPressureModal(false)} />
 
       {/* AI Chatbox */}
       <ChatBox />
