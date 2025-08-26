@@ -49,14 +49,14 @@ export const EmergencyMonitor = () => {
 
   const fetchEmergencyEvents = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: events, error } = await (supabase as any)
         .from('emergency_events')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;
-      setEmergencyEvents(data || []);
+      setEmergencyEvents(events || []);
     } catch (error) {
       console.error('Error fetching emergency events:', error);
     } finally {
@@ -66,7 +66,7 @@ export const EmergencyMonitor = () => {
 
   const resolveEmergency = async (eventId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('emergency_events')
         .update({ 
           status: 'resolved',

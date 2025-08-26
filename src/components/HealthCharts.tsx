@@ -61,14 +61,14 @@ export const HealthCharts = () => {
 
   const fetchHealthMetrics = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: metrics, error } = await (supabase as any)
         .from('health_metrics')
         .select('*')
         .order('recorded_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
-      setMetrics(data || []);
+      setMetrics(metrics || []);
     } catch (error) {
       console.error('Error fetching health metrics:', error);
     } finally {

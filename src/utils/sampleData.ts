@@ -53,7 +53,7 @@ export const generateSampleHealthData = async () => {
       });
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('health_metrics')
       .insert(sampleData);
 
@@ -71,7 +71,7 @@ export const generateSampleEmergencyEvent = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated");
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('emergency_events')
       .insert({
         user_id: user.id,

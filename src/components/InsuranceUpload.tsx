@@ -65,7 +65,7 @@ export const InsuranceUpload = () => {
         }
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('insurance_details')
         .insert({
           user_id: user.id,

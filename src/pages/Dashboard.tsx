@@ -23,8 +23,17 @@ import {
   AlertTriangle, 
   FileText, 
   Settings,
-  LogOut
+  LogOut,
+  User as UserIcon,
+  ChevronDown
 } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 export const Dashboard = () => {
@@ -50,7 +59,13 @@ export const Dashboard = () => {
     }
   };
 
+  // Extract username from email
+  const getUsername = (email: string) => {
+    return email.split('@')[0];
+  };
+
   const userRole = user?.email ? getUserRole(user.email) : 'customer';
+  const username = user?.email ? getUsername(user.email) : 'User';
 
   // Navigation items for main pages
   const mainNavItems = [
@@ -61,13 +76,12 @@ export const Dashboard = () => {
     { id: "faqs", label: "FAQs", icon: Phone, action: () => navigate("/") },
   ];
 
-  // Dashboard navigation items (only for customers)
+  // Dashboard navigation items (only for customers) - removed settings
   const dashboardNavItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "emergency", label: "Emergency", icon: AlertTriangle },
     { id: "prescriptions", label: "Prescriptions", icon: FileText },
     { id: "insurance", label: "Insurance", icon: Shield },
-    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   useEffect(() => {
@@ -161,7 +175,7 @@ export const Dashboard = () => {
           <div className="hidden md:flex">
             {userRole === 'customer' ? (
               <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-                <TabsList className="grid grid-cols-5 w-full max-w-md">
+                <TabsList className="grid grid-cols-4 w-full max-w-md">
                   {dashboardNavItems.map((item) => (
                     <TabsTrigger key={item.id} value={item.id} className="text-xs">
                       {item.label}
@@ -187,17 +201,26 @@ export const Dashboard = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-          <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
-          {/* <ThemeToggle /> */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="flex items-center"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <UserIcon className="h-4 w-4" />
+                <span className="text-sm">{username}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setActiveTab("settings")}>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         {/* Mobile Hamburger */}
         <button
@@ -211,7 +234,7 @@ export const Dashboard = () => {
       {/* Mobile Dropdown Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-card border-b border-border shadow-lg p-4 space-y-4">
-          <span className="block text-sm text-muted-foreground">Welcome, {user.email}</span>
+          <span className="block text-sm text-muted-foreground">Welcome, {username}</span>
 
           {userRole === 'customer' ? (
             <div className="flex flex-col space-y-2">
@@ -222,11 +245,20 @@ export const Dashboard = () => {
                     setActiveTab(item.id);
                     setIsMenuOpen(false);
                   }}
-                  className="text-left text-gray-700 hover:text-blue-600"
+                  className="text-left text-muted-foreground hover:text-foreground"
                 >
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setIsMenuOpen(false);
+                }}
+                className="text-left text-muted-foreground hover:text-foreground"
+              >
+                Settings
+              </button>
             </div>
           ) : (
             <div className="flex flex-col space-y-2">
@@ -237,7 +269,7 @@ export const Dashboard = () => {
                     item.action();
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center text-gray-700 hover:text-blue-600"
+                  className="flex items-center text-muted-foreground hover:text-foreground"
                 >
                   <item.icon className="h-4 w-4 mr-2" />
                   {item.label}
