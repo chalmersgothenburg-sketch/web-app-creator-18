@@ -61,7 +61,7 @@ export const HealthCharts = () => {
 
   const fetchHealthMetrics = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('health_metrics')
         .select('*')
         .order('recorded_at', { ascending: false })

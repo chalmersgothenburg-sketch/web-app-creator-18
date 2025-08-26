@@ -67,7 +67,7 @@ export const PrescriptionUpload = () => {
         }
       }
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('prescriptions')
         .insert({
           user_id: user.id,

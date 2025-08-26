@@ -49,7 +49,7 @@ export const EmergencyMonitor = () => {
 
   const fetchEmergencyEvents = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('emergency_events')
         .select('*')
         .order('created_at', { ascending: false })
@@ -66,7 +66,7 @@ export const EmergencyMonitor = () => {
 
   const resolveEmergency = async (eventId: string) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('emergency_events')
         .update({ 
           status: 'resolved',
