@@ -1,10 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Heart, Phone } from "lucide-react";
-import { Link } from "react-router-dom";
 import heroImage1 from "@/assets/hero-senior1.png";
 import heroImage2 from "@/assets/hero-senior2.jpg";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  isLoggedIn?: boolean;
+  hasOrderedWatch?: boolean;
+  onGetStarted?: () => void;
+  onOrderStatus?: () => void;
+}
+
+export function HeroSection({ 
+  isLoggedIn = false, 
+  hasOrderedWatch = false, 
+  onGetStarted, 
+  onOrderStatus 
+}: HeroSectionProps) {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Full Background Image */}
@@ -53,15 +64,37 @@ export function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/auth">
-                <Button variant="hero" size="lg" className="text-lg">
-                  Get Started Today
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Button variant="outline" size="lg" className="text-lg text-gray-800">
-                Watch Demo
-              </Button>
+              {!isLoggedIn ? (
+                <>
+                  <Button onClick={onGetStarted} variant="hero" size="lg" className="text-lg">
+                    Get Started Today
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                  <Button variant="outline" size="lg" className="text-lg text-gray-800">
+                    Watch Demo
+                  </Button>
+                </>
+              ) : hasOrderedWatch ? (
+                <>
+                  <Button onClick={onOrderStatus} variant="hero" size="lg" className="text-lg">
+                    Order Status
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                  <Button variant="outline" size="lg" className="text-lg text-gray-800">
+                    Watch Demo
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button onClick={onGetStarted} variant="hero" size="lg" className="text-lg">
+                    Get Started Today
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                  <Button variant="outline" size="lg" className="text-lg text-gray-800">
+                    Watch Demo
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Trust Indicators */}
