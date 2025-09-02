@@ -92,7 +92,7 @@ export function FeaturesSection() {
                     <div className="p-2 bg-muted rounded-lg">
                       <feature.icon className={`h-6 w-6 ${feature.color}`} />
                     </div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                    <CardTitle className="text-lg text-foreground">{feature.title}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>

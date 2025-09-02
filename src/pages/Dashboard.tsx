@@ -1,8 +1,6 @@
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { User, Session } from "@supabase/supabase-js";
 import { MarketingDashboard } from "@/components/dashboards/MarketingDashboard";
 import { FinanceDashboard } from "@/components/dashboards/FinanceDashboard";
 import { CustomerSupportDashboard } from "@/components/dashboards/CustomerSupportDashboard";
@@ -12,8 +10,10 @@ import { PrescriptionDashboard } from "@/components/dashboards/PrescriptionDashb
 import { InsuranceDashboard } from "@/components/dashboards/InsuranceDashboard";
 import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ClinicalDiagnosisDashboard } from "@/components/dashboards/ClinicalDiagnosisDashboard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { fetchDevices, fetchDashboard } from "@/lib/deviceApi";
 import { 
   Heart, 
   Activity, 
@@ -25,7 +25,8 @@ import {
   Settings,
   LogOut,
   User as UserIcon,
-  ChevronDown
+  ChevronDown,
+  Stethoscope
 } from "lucide-react";
 import { 
   DropdownMenu,
@@ -35,11 +36,47 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { DashboardData } from "@/types/types";
+
+function transformApiResponse(apiData: any): DashboardData {
+  return {
+    latest_bp_systolic: apiData.bp.bp_systolic,
+    latest_bp_diastolic: apiData.bp.bp_diastolic,
+    latest_o2: apiData.spo2.latest,
+    latest_battery: apiData.battery,
+    latest_latitude: apiData.location.latitude,
+    latest_longitude: apiData.location.longitude,
+    total_steps: apiData.steps.total,
+    calories_burned: apiData.calories_burned.total,
+    calories_burned_active: apiData.calories_burned.active,
+    calories_burned_resting: apiData.calories_burned.resting,
+    calories_burned_trend7d: apiData.calories_burned.trend_7d,
+    heartrate: apiData.heartrate.latest,
+    stress: apiData.heartrate.stress,
+    sleep_quality: {
+      duration: apiData.sleep_quality.duration,
+      deep_sleep: apiData.sleep_quality.deep_sleep,
+      light_sleep: apiData.sleep_quality.light_sleep,
+      sleep_quality_score: apiData.sleep_quality.sleep_quality_score,
+      sleep_pattern_timeline: apiData.sleep_quality.sleep_pattern_timeline,
+      sleep_quality_text: apiData.sleep_quality.sleep_quality_text,
+      sleep_period: apiData.sleep_quality.sleep_period,
+    },
+  };
+}
+
+interface Device {
+  device_id: string;
+  model?: string;
+}
 
 export const Dashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedDevice, setSelectedDevice] = useState<string>("00bf82a1-217e-4188-ba2e-6697595c49b9");
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -64,8 +101,9 @@ export const Dashboard = () => {
     return email.split('@')[0];
   };
 
-  const userRole = user?.email ? getUserRole(user.email) : 'customer';
-  const username = user?.email ? getUsername(user.email) : 'User';
+  const email = localStorage.getItem("userEmail");
+  const userRole = email != null ? getUserRole(email) : 'customer';
+  const username = email != null ? getUsername(email) : 'User';
 
   // Navigation items for main pages
   const mainNavItems = [
@@ -82,44 +120,85 @@ export const Dashboard = () => {
     { id: "emergency", label: "Emergency", icon: AlertTriangle },
     { id: "prescriptions", label: "Prescriptions", icon: FileText },
     { id: "insurance", label: "Insurance", icon: Shield },
+    { id: "diagnosis", label: "Diagnosis", icon: Stethoscope },
   ];
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (!session) {
-          navigate("/auth");
-        }
-        setLoading(false);
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (!session) {
-        navigate("/auth");
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Check for user session (token/email) in localStorage
+    const email = localStorage.getItem("userEmail");
+    if (!email) {
+      navigate("/auth");
+    } else {
+      setUserEmail(email);
+    }
+    setLoading(false);
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast.success("Signed out successfully");
-      navigate("/");
-    } catch (error) {
-      toast.error("Error signing out");
+  useEffect(() => {
+    // Fetch devices for user on dashboard load
+    const uid = localStorage.getItem("uid");
+    const token = localStorage.getItem("access_token");
+    if (!uid || !token) {
+      navigate("/auth");
+      setLoading(false);
+      return;
     }
+    setUserEmail(localStorage.getItem("userEmail"));
+    fetchDevices(uid, token)
+      .then((data) => {
+        setDevices(data);
+        // setSelectedDevice("00bf82a1-217e-4188-ba2e-6697595c49b9");
+        if (data.length > 0) {
+          setSelectedDevice(data[0].id);
+        } else {
+          setSelectedDevice("");
+        }
+      })
+      .catch(() => toast.error("Failed to load devices"))
+      .finally(() => setLoading(false));
+  }, [navigate]);
+
+  useEffect(() => {
+    const uid = localStorage.getItem("uid");
+    const token = localStorage.getItem("access_token");
+    const email = localStorage.getItem("userEmail");
+    console.log("Effect running: selectedDevice=", selectedDevice, "email=", email, "token=", token);
+
+    if (!uid || !token) {
+      setDashboardData(null);
+      return;
+    }
+
+    // function to fetch and set data
+    const fetchData = () => {
+      console.log("Polling tick @", new Date().toISOString());
+
+      fetchDashboard(email, selectedDevice, token)
+        .then((data) => {console.log("Fetched data: ",data); 
+          setDashboardData(transformApiResponse(data))})
+        .catch((err) => {
+          console.error("Fetch error:", err);
+          setDashboardData(null);
+          toast.error("Failed to load dashboard data");
+        });
+    };
+
+    // fetch immediately once
+    fetchData();
+
+    // set interval for 10 sec
+    const intervalId = setInterval(() => {fetchData();}, 3000);
+
+    // cleanup on unmount or when selectedDevice changes
+    return () => clearInterval(intervalId);
+  }, [selectedDevice, email]);
+
+
+  const handleSignOut = async () => {
+    // Remove user session
+    localStorage.removeItem("userEmail");
+    toast.success("Signed out successfully");
+    navigate("/");
   };
 
   if (loading) {
@@ -130,7 +209,7 @@ export const Dashboard = () => {
     );
   }
 
-  if (!user) {
+  if (!userEmail) {
     return null;
   }
 
@@ -144,6 +223,7 @@ export const Dashboard = () => {
         return <CustomerSupportDashboard />;
       case 'customer':
       default:
+        // console.log("Dashboard data updated:", dashboardData);
         return renderCustomerDashboard();
     }
   };
@@ -151,17 +231,19 @@ export const Dashboard = () => {
   const renderCustomerDashboard = () => {
     switch (activeTab) {
       case "dashboard":
-        return <CustomerDashboard />;
+        return <CustomerDashboard data={dashboardData} devices={devices} selectedDevice={selectedDevice} onDeviceChange={setSelectedDevice} />;
       case "emergency":
         return <EmergencyDashboard />;
       case "prescriptions":
         return <PrescriptionDashboard />;
       case "insurance":
         return <InsuranceDashboard />;
+      case "diagnosis":
+        return <ClinicalDiagnosisDashboard />;
       case "settings":
         return <SettingsDashboard />;
       default:
-        return <CustomerDashboard />;
+        return <CustomerDashboard data={dashboardData} devices={devices} selectedDevice={selectedDevice} onDeviceChange={setSelectedDevice}/>;
     }
   };
 
@@ -208,7 +290,7 @@ export const Dashboard = () => {
                 <div className="absolute inset-0.5 bg-green-500 rounded-sm" style={{ width: '78%' }}></div>
                 <div className="absolute -right-0.5 top-1/2 -translate-y-1/2 w-0.5 h-1.5 bg-muted-foreground rounded-r-sm"></div>
               </div>
-              <span className="text-xs font-medium">78%</span>
+              <span className="text-xs font-medium">{dashboardData ? `${dashboardData.latest_battery} %` : "--"}</span>
             </div>
           </div>
           

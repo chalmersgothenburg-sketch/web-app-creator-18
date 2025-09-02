@@ -1,7 +1,5 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,85 +11,78 @@ import { Eye, EyeOff, Heart } from "lucide-react";
 import { PlansSection } from "@/components/PlansSection";
 import { ContactSection } from "@/components/ContactSection";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
 export const Auth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session) {
-          navigate("/dashboard");
-        }
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        return { error: { message: data.message || "Signup failed" } };
       }
-    });
-    return { error };
+      return { error: null };
+    } catch (err) {
+      return { error: { message: "Network error" } };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    return { error };
-  };
-
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { error: { message: data.detail || "Login failed" } };
       }
-    });
-    if (error) {
-      toast.error("Failed to sign in with Google");
+      // Save token, uid, and email in localStorage
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("userEmail", email);
+      if (data.uid) {
+        localStorage.setItem("uid", data.uid);
+      }
+      return { error: null };
+    } catch (err) {
+      return { error: { message: "Network error" } };
     }
   };
 
-  const signInWithFacebook = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`
-      }
-    });
-    if (error) {
-      toast.error("Failed to sign in with Facebook");
-    }
-  };
+  // const signInWithGoogle = async () => {
+  //   const { error } = await supabase.auth.signInWithOAuth({
+  //     provider: 'google',
+  //     options: {
+  //       redirectTo: `${window.location.origin}/dashboard`
+  //     }
+  //   });
+  //   if (error) {
+  //     toast.error("Failed to sign in with Google");
+  //   }
+  // };
+
+  // const signInWithFacebook = async () => {
+  //   const { error } = await supabase.auth.signInWithOAuth({
+  //     provider: 'facebook',
+  //     options: {
+  //       redirectTo: `${window.location.origin}/dashboard`
+  //     }
+  //   });
+  //   if (error) {
+  //     toast.error("Failed to sign in with Facebook");
+  //   }
+  // };
 
   const handleAuth = async (type: 'signin' | 'signup') => {
     if (!email || !password) {
@@ -100,16 +91,15 @@ export const Auth = () => {
     }
 
     setLoading(true);
-    
     try {
-      const { error } = type === 'signin' 
+      const { error } = type === 'signin'
         ? await signIn(email, password)
         : await signUp(email, password);
 
       if (error) {
-        if (error.message.includes("Invalid login credentials")) {
+        if (error.message.toLowerCase().includes("invalid")) {
           toast.error("Invalid email or password");
-        } else if (error.message.includes("User already registered")) {
+        } else if (error.message.toLowerCase().includes("exists")) {
           toast.error("An account with this email already exists. Please sign in instead.");
         } else {
           toast.error(error.message);
@@ -118,10 +108,11 @@ export const Auth = () => {
       }
 
       if (type === 'signup') {
-        toast.success("Account created successfully! Please check your email to verify your account.");
+        toast.success("Account created successfully!");
       } else {
         toast.success("Signed in successfully!");
       }
+      navigate("/dashboard");
     } catch (error) {
       toast.error("An unexpected error occurred");
     } finally {
@@ -208,7 +199,7 @@ export const Auth = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <Button
+                    {/* <Button
                       onClick={signInWithGoogle}
                       variant="outline"
                       className="w-full"
@@ -233,7 +224,7 @@ export const Auth = () => {
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                       </svg>
                       Sign in with Facebook
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </TabsContent>
@@ -293,7 +284,7 @@ export const Auth = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <Button
+                    {/* <Button
                       onClick={signInWithGoogle}
                       variant="outline"
                       className="w-full"
@@ -318,7 +309,7 @@ export const Auth = () => {
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                       </svg>
                       Sign up with Facebook
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </TabsContent>
