@@ -1,18 +1,14 @@
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapPin } from 'lucide-react';
 
 export const SimpleMap = ({ latitude, longitude }: { latitude: number; longitude: number }) => (
-  <MapContainer
-    center={[latitude, longitude]}
-    zoom={13}
-    style={{ height: '400px', width: '100%' }}
-  >
-    <TileLayer
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      attribution='&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    />
-    <Marker position={[latitude, longitude]}>
-      <Popup>Your Location</Popup>
-    </Marker>
-  </MapContainer>
+  <div className="h-96 w-full bg-muted rounded-lg flex items-center justify-center">
+    <div className="text-center">
+      <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+      <p className="text-sm text-muted-foreground">Location Map</p>
+      <p className="text-xs text-muted-foreground">
+        {latitude.toFixed(4)}, {longitude.toFixed(4)}
+      </p>
+    </div>
+  </div>
 );

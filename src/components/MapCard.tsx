@@ -3,8 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, Route, Maximize2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 
 // Mock GPS data for the day's travel path
 const mockTravelPath = [
@@ -23,30 +21,13 @@ interface MapCardProps {
 export const MapCard: React.FC<MapCardProps> = ({ className }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Using first mock location as center for map
-  const centerLat = mockTravelPath[0].lat;
-  const centerLng = mockTravelPath[0].lng;
-
-  const MapContent = ({ isModal = false }: { isModal?: boolean }) => (
-    <div className={`relative ${isModal ? 'h-[70vh]' : 'h-64'} w-full rounded-lg overflow-hidden`}>
-      <MapContainer center={[centerLat, centerLng]} zoom={12} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {/* Markers */}
-        {mockTravelPath.map((point, index) => (
-          <Marker key={index} position={[point.lat, point.lng]}>
-            <Popup>
-              <div className="p-2">
-                <strong>{point.location}</strong>
-                <br />
-                {point.time}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+  const MapPlaceholder = ({ isModal = false }: { isModal?: boolean }) => (
+    <div className={`relative ${isModal ? 'h-[70vh]' : 'h-64'} w-full rounded-lg overflow-hidden bg-muted flex items-center justify-center`}>
+      <div className="text-center">
+        <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Map View</p>
+        <p className="text-xs text-muted-foreground">NYC Travel Route</p>
+      </div>
 
       {/* Overlay info */}
       <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 shadow-lg z-10">
@@ -92,7 +73,7 @@ export const MapCard: React.FC<MapCardProps> = ({ className }) => {
               <h3 className="text-lg font-semibold">Location & Travel</h3>
             </div>
           </div>
-          <MapContent />
+          <MapPlaceholder />
 
           {/* Travel Summary */}
           <div className="mt-4 grid grid-cols-3 gap-4 text-center">
@@ -122,7 +103,7 @@ export const MapCard: React.FC<MapCardProps> = ({ className }) => {
             </DialogTitle>
           </DialogHeader>
 
-          <MapContent isModal />
+          <MapPlaceholder isModal />
 
           {/* Travel Details */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
